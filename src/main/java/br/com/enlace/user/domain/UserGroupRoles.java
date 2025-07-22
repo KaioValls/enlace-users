@@ -16,6 +16,8 @@ public class UserGroupRoles {
     private User user;
     @Column(name = "group_id")
     private Long groupId;
+
+    @Enumerated(EnumType.STRING)
     private Role role;
     @Column(name = "joined_at")
     private LocalDateTime joinedAt;

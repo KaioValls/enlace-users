@@ -6,7 +6,8 @@ public enum GroupType {
     MINISTRY("Ministério"),
     DEPARTMENT("Departamento"),
     COMMITTEE("Comitê"),
-    PRAYER_GROUP("Grupo de Oração");
+    PRAYER_GROUP("Grupo de Oração"),
+    GENERIC("Genérico");
 
     private final String description;
 

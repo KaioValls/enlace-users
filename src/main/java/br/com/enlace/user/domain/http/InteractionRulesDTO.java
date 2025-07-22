@@ -14,5 +14,4 @@ public class InteractionRulesDTO {
     private int maxMembers;
     private Boolean allowMemberInvite;
 
-
 }

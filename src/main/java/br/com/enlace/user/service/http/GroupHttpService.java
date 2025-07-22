@@ -1,6 +1,7 @@
 package br.com.enlace.user.service.http;
 
 import br.com.enlace.user.domain.http.GroupDTO;
+import io.smallrye.mutiny.Uni;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
@@ -11,7 +12,5 @@ public interface GroupHttpService {
 
     @GET
     @Path("{id}")
-    GroupDTO getGroupDTOById(Long id);
-
-
+    Uni<GroupDTO> getGroupDTOById(Long id);
 }

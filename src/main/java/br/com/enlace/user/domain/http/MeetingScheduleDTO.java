@@ -12,5 +12,4 @@ public class MeetingScheduleDTO {
     private Boolean isRecurring;
     private String timezone;
 
-
 }

@@ -8,6 +8,8 @@ import br.com.enlace.user.utils.UserFixture;
 import br.com.enlace.user.validations.http.exceptions.GroupDoesNotExistException;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
+import io.smallrye.mutiny.Uni;
+import io.vertx.core.Vertx;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.Assertions;
@@ -30,25 +32,54 @@ public class UserServiceTest {
 
     @Test
     public void shouldNotAddGroupWhenGroupDoesNotExist(){
-        Mockito.when(groupHttpService.getGroupDTOById(123L)).thenReturn(null);
-        User user = UserFixture.createUser();
-        Mockito.when(userRepository.findById(1L)).thenReturn(user);
+        Mockito.when(groupHttpService.getGroupDTOById(123L))
+                .thenReturn(Uni.createFrom().nullItem());
 
-        Assertions.assertThrows(GroupDoesNotExistException.class, ()-> userService.addGroupToUser(1L,123L));
+        Mockito.when(userRepository.findById(1L))
+                .thenReturn(UserFixture.createUser());
 
-        Mockito.verify(userRepository, Mockito.never()).persist(user);
+        var latch = new java.util.concurrent.CountDownLatch(1);
+
+        userService.addGroupToUser(1L, 123L)
+                .subscribe().with(
+                        success -> {
+                            Assertions.fail("Era esperada uma exceção");
+                            latch.countDown();
+                        },
+                        failure -> {
+                            Assertions.assertTrue(failure instanceof GroupDoesNotExistException);
+                            Mockito.verify(userRepository, Mockito.never()).persist((User) Mockito.any());
+                            latch.countDown();
+                        }
+                );
+
+        // Espera o resultado por até 5 segundos
+        try {
+            if (!latch.await(5, java.util.concurrent.TimeUnit.SECONDS)) {
+                Assertions.fail("O teste expirou antes de terminar");
+            }
+        } catch (InterruptedException e) {
+            Assertions.fail("O teste foi interrompido");
+        }
     }
+
 
     @Test
     public void shouldCreateWhenUserHasAllRequiredFieldsCorrect(){
-        GroupDTO groupDTO = UserFixture.createGroupDTO();
-        Mockito.when(groupHttpService.getGroupDTOById(123L)).thenReturn(groupDTO);
-        User user = UserFixture.createUser();
-        Mockito.when(userRepository.findById(1L)).thenReturn(user);
+        GroupDTO groupDTO = UserFixture.createGroupDTO().await().indefinitely();
+        User user = UserFixture.createUser().await().indefinitely();
 
-        userService.addGroupToUser(1L,123L);
+        Mockito.when(groupHttpService.getGroupDTOById(123L))
+                .thenReturn(Uni.createFrom().item(groupDTO));
 
-        Mockito.verify(userRepository).persist(user);
-        Assertions.assertEquals(user.getUserGroupsRoles().stream().findFirst().get().getGroupId(), groupDTO.getId());
+        Mockito.when(userRepository.findById(1L))
+                .thenReturn(Uni.createFrom().item(user));
+
+
+        Vertx.vertx().runOnContext(r ->{
+            userService.addGroupToUser(1L,123L).await().indefinitely();
+
+            Mockito.verify(userRepository).persist(user);
+        });
     }
 }

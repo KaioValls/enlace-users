@@ -1,6 +1,8 @@
 package br.com.enlace.user.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -10,7 +12,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User extends PanacheEntityBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,6 +41,7 @@ public class User {
     @Column(name = "profile_photo_url")
     private String profilePhotoUrl;
 
+    @Enumerated(EnumType.STRING)
     private UserStatus status = UserStatus.ACTIVE;
 
     @Column(name = "last_presence")
@@ -57,7 +60,8 @@ public class User {
     @JoinColumn(name = "preferences_id")
     private UserPreferences preferences;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
     private Set<UserGroupRoles> userGroupsRoles = new HashSet<>();
     //private Set<Authentication> authentications = new HashSet;
 

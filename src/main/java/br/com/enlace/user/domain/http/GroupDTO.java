@@ -15,7 +15,7 @@ public class GroupDTO {
     private InteractionRulesDTO interactionRules;
     private GroupLocationDTO location;
     private TreasuryDTO treasury;
-    private GroupStatisticsDTO statistics;
+    // TODO: NOSQL : private GroupStatisticsDTO statistics;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private GroupStatus status;

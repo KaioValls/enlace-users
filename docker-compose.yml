@@ -1,18 +1,18 @@
 services:
     enlace-users:
-        image: kaiovalls/enlace-users:v1.0
+        image: kaiovalls/enlace-users:v1.1
         container_name: enlace-users-api
         environment:
             - QUARKUS_CLIENT_HTTP=host.docker.internal
             - QUARKUS_CLIENT_PORT=8181
             - QUARKUS_DATASOURCE_USERNAME=enlace
             - QUARKUS_DATASOURCE_PASSWORD=3nl4c3
-            - QUARKUS_DATASOURCE_HOST=postgres-db-enlace-service
+            - QUARKUS_DATASOURCE_HOST=postgres-db-enlace-user
             - QUARKUS_DATASOURCE_PORT=5432
         ports:
             - "8080:8080"
         depends_on:
-            - postgres-db-enlace-service
+            - postgres-db-enlace-user
 
     prometheus:
         image: prom/prometheus
@@ -30,9 +30,9 @@ services:
         depends_on:
             - prometheus
 
-    postgres-db-enlace-service:
+    postgres-db-enlace-user:
         image: postgres:14
-        container_name: postgres-db-enlace-service-container
+        container_name: postgres-db-enlace-service-user
         environment:
             - POSTGRES_USER=enlace
             - POSTGRES_PASSWORD=3nl4c3
@@ -40,7 +40,7 @@ services:
         ports:
             - "5433:5432"
         volumes:
-            - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+            - postgres_data_user:/var/lib/postgresql/data
 
 volumes:
     postgres_data:
