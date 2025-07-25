@@ -1,61 +1,105 @@
-# users
+# Enlace - Microservices API Documentation
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+Enlace is a modular social platform designed to manage small groups (called "cells") and communities. This repository contains the **User API** which is a key microservice in the Enlace ecosystem.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+- **User API**: Manages user registration, authentication, profile updates, and user relationships.
 
-## Running the application in dev mode
+---
 
-You can run your application in dev mode that enables live coding using:
+## 📦 Technologies
 
-```shell script
-./mvnw quarkus:dev
+- Java 17+
+- Quarkus (Reactive Stack)
+- PostgreSQL 14
+- Hibernate Reactive & Panache
+- Flyway (Database migrations)
+- Docker & Docker Compose
+- Maven
+
+---
+
+## 📁 Project Structure
+
+```bash
+enlace/
+├── user-api/         # User microservice
+├── group-api/        # Group microservice
+└── docker-compose.yml
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+---
 
-## Packaging and running the application
+## ▶️ Getting Started
 
-The application can be packaged using:
+### Prerequisites
 
-```shell script
-./mvnw package
+- Docker & Docker Compose
+- JDK 17+
+- Maven 3.9+
+
+### Running with Docker Compose
+
+```bash
+docker-compose up --build
 ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+This will start PostgreSQL and both services (if Dockerfiles are provided).
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+---
 
-If you want to build an _über-jar_, execute the following command:
+## 🔐 User API
 
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
+### Base URL
+
+```
+http://localhost:8181/api/users
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+### Endpoints
 
-## Creating a native executable
+| Method | Path                 | Description                    |
+|--------|----------------------|--------------------------------|
+| GET    | `/`                  | List all users                 |
+| GET    | `/{userId}`          | Get user by ID                 |
+| POST   | `/`                  | Create a new user              |
+| PUT    | `/{userId}`          | Update user by ID              |
+| DELETE | `/{userId}`          | Delete user by ID              |
 
-You can create a native executable using:
+---
 
-```shell script
-./mvnw package -Dnative
+## 🔧 Configuration
+
+All service configuration can be managed via `application.yml`:
+
+```yaml
+quarkus:
+  datasource:
+    db-kind: postgresql
+    username: enlace
+    password: 3nl4c3
+    jdbc:
+      url: jdbc:postgresql://localhost:5433/user
+  flyway:
+    migrate-at-start: true
+    locations: db/migration
 ```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
+---
 
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
+## 📌 Notes
 
-You can then execute your native executable with: `./target/users-1.0.0-SNAPSHOT-runner`
+- Database scripts are located in `/db/migration`.
+- The project uses **Flyway** to manage schema evolution.
+- Both APIs follow RESTful principles and use JSON for communication.
 
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
+---
 
-## Related Guides
+## 📫 Contact
 
-- REST ([guide](https://quarkus.io/guides/rest)): A Jakarta REST implementation utilizing build time processing and Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it.
-- REST Jackson ([guide](https://quarkus.io/guides/rest#json-serialisation)): Jackson serialization support for Quarkus REST. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it
-- Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplify your persistence code for Hibernate ORM via the active record or the repository pattern
-- JDBC Driver - PostgreSQL ([guide](https://quarkus.io/guides/datasource)): Connect to the PostgreSQL database via JDBC
+For questions or contributions, please contact the Enlace development team or open an issue.
+
+---
+
+## License
+
+This project is licensed under the MIT License.
