@@ -11,6 +11,6 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 public interface GroupHttpService {
 
     @GET
-    @Path("{id}")
+    @Path("/{id}")
     Uni<GroupDTO> getGroupDTOById(Long id);
 }

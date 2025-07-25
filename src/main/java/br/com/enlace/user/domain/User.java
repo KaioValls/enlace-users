@@ -61,7 +61,7 @@ public class User extends PanacheEntityBase {
     private UserPreferences preferences;
 
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
     private Set<UserGroupRoles> userGroupsRoles = new HashSet<>();
     //private Set<Authentication> authentications = new HashSet;
 

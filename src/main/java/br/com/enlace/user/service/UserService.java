@@ -1,9 +1,11 @@
 package br.com.enlace.user.service;
 
+import br.com.enlace.user.domain.Role;
 import br.com.enlace.user.domain.User;
 import br.com.enlace.user.domain.UserGroupRoles;
 import br.com.enlace.user.domain.UserPreferences;
 import br.com.enlace.user.domain.http.GroupDTO;
+import br.com.enlace.user.domain.http.GroupStatus;
 import br.com.enlace.user.repository.UserRepository;
 import br.com.enlace.user.service.http.GroupHttpService;
 import br.com.enlace.user.validations.http.exceptions.GroupDoesNotExistException;
@@ -89,9 +91,16 @@ public class UserService {
     )
     public Uni<Void> addGroupToUser(Long userId, Long groupId){
         Uni<GroupDTO> groupDTOById = groupHttpService.getGroupDTOById(groupId);
+
+        //Testing integration, suposed to fail with
         return groupDTOById
                 .onItem().ifNull().failWith(new GroupDoesNotExistException())
-                .onItem().transformToUni(group -> persistGroupToUser(userId, group));
+                .onItem().transformToUni(group -> {
+                    if(!group.getStatus().equals(GroupStatus.ACTIVE)){
+                        throw new EntityNotFoundException();
+                    }
+                    return  persistGroupToUser(userId, group);
+                });
     }
 
     private Uni<Void> persistGroupToUser(Long userId, GroupDTO groupId) {
@@ -102,6 +111,8 @@ public class UserService {
                 .onItem().transformToUni(user -> {
                     UserGroupRoles userGroupRoles = new UserGroupRoles();
                     userGroupRoles.setGroupId(groupId.getId());
+                    userGroupRoles.setUser(user);
+                    userGroupRoles.setRole(Role.MEMBER);
                     user.addUserGroupsRoles(userGroupRoles);
 
                     return userRepository.persist(user);

@@ -30,7 +30,9 @@ public class UserController {
     @PUT
     @NonBlocking
     @Path("/addGroup")
-    public Uni<RestResponse<Void>> addGroup(@PathParam("userId") Long userId,@PathParam("groupId") Long groupId, @Context UriInfo uriInfo){
+    public Uni<RestResponse<Void>> addGroup(@QueryParam("userId") Long userId,@QueryParam("groupId") Long groupId, @Context UriInfo uriInfo){
+        System.out.println(groupId);
+        System.out.println(userId);
         return this.userService.addGroupToUser(userId, groupId)
                 .replaceWith(RestResponse.created(uriInfo.getAbsolutePath()));
     }
